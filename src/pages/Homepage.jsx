@@ -1,5 +1,5 @@
 import React, {  useEffect, useRef, useState } from "react";
-import { BiSearch, BiUser } from "react-icons/bi";
+import { BiSearch } from "react-icons/bi";
 import logo from "../Images/LogoChitChat.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,7 +11,7 @@ const Homepage = () => {
   const [debounceValue, setDebounceValue] = useState("")
   const [allUser, setAllUser] = useState([])
   const [allChats,setAllChats] = useState([])
-
+  const [loginUser,setLoginUser] = useState()
 //   const [error, setError] = useState(null);
 //   const [loading, setLoading] = useState(false);
 
@@ -56,10 +56,9 @@ const Homepage = () => {
         },
       })
       .then((res) => {
-        console.log(res.data);
-        setAllChats(res.data)
-       
-        
+        console.log(res);
+        setAllChats(res.data?.[0])
+        setLoginUser(res.data?.[1].loginuser)
       })
       .catch((err) => {
         // token is invalid
@@ -110,8 +109,12 @@ const Homepage = () => {
         <div className="h-[4vmax] flex justify-center items-center">
           <img src={logo} alt="logo" className="h-full object-contain" />
         </div>
-        <div className="bg-white rounded-full text-black p-1">
-          <BiUser className="h-[3vmax] w-[3vmax]" />
+        <div className="h-[4vmax] w-[4vmax] rounded-full p-1">
+          <img
+            src={loginUser?.picture}
+            alt="dp"
+            className="h-full w-full object-cover rounded-full"
+          />
         </div>
       </div>
 
@@ -128,24 +131,31 @@ const Homepage = () => {
                     <img src={user.picture} alt="dp" className="h-full w-full object-cover rounded-full"/>
                </div>
                 <p className="font-semibold">{user.username}</p>
+                <hr />
               </div>
             ))
         }
-        {
-            allChats.length > 0 && allChats.map((chat) => (
-                <div
-                key={chat._id}
-                onClick={() => navigate(`/chat/${chat.user[1].username}`)}
-                className="flex w-full gap-4 cursor-pointer items-center rounded-md p-1  bg-green-400 hover:bg-gray-300"
-              >
-               <div className="h-[5vmax] w-[5vmax] rounded-full p-1 ">
-                    <img src={chat.user[1].picture} alt="dp" className="h-full w-full object-cover rounded-full"/>
-               </div>
-                <p className="font-semibold">{chat.user[1].username}</p>
-              </div>
-            ))
-        }
-
+       {
+  allChats.length > 0 && allChats.map((chat) => {
+    const otherUser = chat.user.find(user => user._id !== loginUser._id);
+    return otherUser ? (
+      <div
+        key={chat._id}
+        onClick={() => navigate(`/chat/${otherUser.username}`)}
+        className="flex w-full gap-4 cursor-pointer items-center rounded-md p-1 bg-green-400 hover:bg-gray-300"
+      >
+        <div className="h-[5vmax] w-[5vmax] rounded-full p-1">
+          <img
+            src={otherUser.picture}
+            alt="dp"
+            className="h-full w-full object-cover rounded-full"
+          />
+        </div>
+        <p className="font-semibold">{otherUser.username}</p>
+      </div>
+    ) : null;
+  })
+}
       </div>
     </div>
   );
