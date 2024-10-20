@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {  useEffect, useRef, useState } from "react";
 import { BiSearch, BiUser } from "react-icons/bi";
 import logo from "../Images/LogoChitChat.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Homepage = () => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
   const [searchBarVisible, setSearchBarVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debounceValue, setDebounceValue] = useState("")
   const [allUser, setAllUser] = useState([])
+  const [allChats,setAllChats] = useState([])
+
 //   const [error, setError] = useState(null);
 //   const [loading, setLoading] = useState(false);
 
@@ -28,13 +30,13 @@ const Homepage = () => {
         }
         if (debounceValue){
             axios.post("http://localhost:4000/searchuser",{ searchQuery: debounceValue },{headers:{
-                "Authorization":token
+                "authorization":token
             }} ).then((response)=>setAllUser(response.data)).catch((error)=>console.log(error)
             )
         }
     }, 500);
     return () => clearTimeout(debounceFn);
-    }, [searchQuery,debounceValue,token]);
+    }, [searchQuery,debounceValue,token,navigate]);
 
 
 
@@ -48,17 +50,21 @@ const Homepage = () => {
 
     // verify the token
     axios
-      .get("http://localhost:4000/chats", {
+      .get("http://localhost:4000/", {
         headers: {
-          authorization: token,
+          "authorization": token,
         },
       })
       .then((res) => {
         console.log(res.data);
-        // token is valid
+        setAllChats(res.data)
+       
+        
       })
       .catch((err) => {
         // token is invalid
+        console.log("load chat And auth=>\n",err);
+        
         alert("Your session has expired. Please login again.");
         navigate("/login");
       });
@@ -114,14 +120,32 @@ const Homepage = () => {
         {
            allUser.length > 0 && allUser.map((user) => (
               <div
-                key={user}
-                onClick={() => navigate(`/chat/${user}`)}
-                className="flex items-center gap-2 cursor-pointer hover:bg-gray-300"
+                key={user._id}
+                onClick={() => navigate(`/chat/${user.username}`)}
+                className="flex w-full gap-4 cursor-pointer items-center rounded-md p-1  bg-green-400 hover:bg-gray-300"
               >
-                <p>{user}</p>
+               <div className="h-[5vmax] w-[5vmax] rounded-full p-1 ">
+                    <img src={user.picture} alt="dp" className="h-full w-full object-cover rounded-full"/>
+               </div>
+                <p className="font-semibold">{user.username}</p>
               </div>
             ))
         }
+        {
+            allChats.length > 0 && allChats.map((chat) => (
+                <div
+                key={chat._id}
+                onClick={() => navigate(`/chat/${chat.user[1].username}`)}
+                className="flex w-full gap-4 cursor-pointer items-center rounded-md p-1  bg-green-400 hover:bg-gray-300"
+              >
+               <div className="h-[5vmax] w-[5vmax] rounded-full p-1 ">
+                    <img src={chat.user[1].picture} alt="dp" className="h-full w-full object-cover rounded-full"/>
+               </div>
+                <p className="font-semibold">{chat.user[1].username}</p>
+              </div>
+            ))
+        }
+
       </div>
     </div>
   );

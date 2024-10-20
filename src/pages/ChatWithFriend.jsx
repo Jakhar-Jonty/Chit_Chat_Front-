@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import io from "socket.io-client";
 
-const socket = io('http://localhost:4000');
+const socket = io("http://localhost:4000");
 
 export const ChatWithFriend = () => {
     const location = useLocation() 
@@ -18,10 +18,10 @@ export const ChatWithFriend = () => {
 
     const sendMessage = (e) => {
         e.preventDefault();
-        socket.emit('message', message, () => setMessage(''));
+        socket.emit("message", message, () => setMessage(''));
     }
     
-    socket.on('newMessage', (msg) => {
+    socket.on("newMessage", (msg) => {
         setMessage([...allMessages, msg]);
     });
     

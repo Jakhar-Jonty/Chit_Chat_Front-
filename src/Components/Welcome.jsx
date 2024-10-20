@@ -12,7 +12,7 @@ const Welcome = () => {
              <Link to='/login'>
                  <button className='w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded'>Login</button>
              </Link>
-             <Link to='/signup'>
+             <Link to='/register'>
                  <button className='w-full mt-4 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded'>Sign Up</button>
              </Link>
          </div>
